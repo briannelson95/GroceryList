@@ -1,37 +1,48 @@
-import React, { Component } from 'react'
+import React, { Component, useState } from 'react'
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { FIREBASE_AUTH, provider } from "../../firebaseConfig"
 
 const Login = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const auth = getAuth();
+    
     const signUp = async() => {
-        signInWithPopup(FIREBASE_AUTH, provider)
-            .then((result) => {
-                const credential = GoogleAuthProvider.credentialFromResult(result)
-                const token = credential.accessToken;
-                const user = result.user;
-            }).catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-
-                const email = error.email;
-                const credential = GoogleAuthProvider.credentialFromError(error)
-            })
+        const after = await createUserWithEmailAndPassword(auth, email, password);
+        console.log('Success');
+        alert('Check your email')
     };
 
     const signIn =async () => {
-        
+        const user = await signInWithEmailAndPassword(auth, email, password)
     };
 
     return (
         <View style={styles.container}>
             <Text style={styles.logo}>Grocery App</Text>
-            <Pressable style={styles.button} onPress={signUp}>
-                <Text style={styles.buttonText}>Sign Up</Text>
-            </Pressable>
-            <Pressable style={styles.signIn} onPress={signIn}>
-                <Text style={{fontSize: 14}}>Log In</Text>
-            </Pressable>
+            <View style={styles.form}>
+                <TextInput
+                    placeholder='Email'
+                    onChangeText={(text: string) => setEmail(text)}
+                    value={email}
+                    style={styles.input}
+                />
+                <TextInput
+                    placeholder='Password'
+                    textContentType='password'
+                    onChangeText={(text: string) => setPassword(text)}
+                    value={password}
+                    style={styles.input}
+                />
+                <Pressable style={styles.button} onPress={signUp}>
+                    <Text style={styles.buttonText}>Sign Up</Text>
+                </Pressable>
+                <Pressable style={styles.signIn} onPress={signIn}>
+                    <Text style={{fontSize: 14}}>Log In</Text>
+                </Pressable>
+            </View>
+           
         </View>
     )
 }
@@ -40,15 +51,24 @@ export default Login;
 
 const styles = StyleSheet.create({
     container: {
-        marginHorizontal: 20,
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
+        marginHorizontal: 10,
+    },
+    form: {
+        flexDirection: 'column',
+        marginVertical: 20,
     },
     logo: {
         fontSize: 32,
         fontWeight: "bold",
-        marginBottom: 24,
+        justifyContent: 'center',
+    },
+    input: {
+        height: 40,
+        borderWidth: 1,
+        borderRadius: 4,
+        padding: 10,
+        backgroundColor: '#fff',
+        marginVertical: 4,
     },
     button: {
         backgroundColor: '#0088ff',
