@@ -26,7 +26,7 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='Recipes'>
+      <Stack.Navigator initialRouteName='Login'>
         <Stack.Screen name="My Todos" component={List} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Recipes" component={Recipes} />

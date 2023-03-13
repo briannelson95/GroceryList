@@ -1,48 +1,27 @@
-import React, { Component, useState } from 'react'
+import React, { Component, useEffect, useState } from 'react'
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { FIREBASE_AUTH, provider } from "../../firebaseConfig"
+import auth from '@react-native-firebase/app';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const auth = getAuth();
-    
-    const signUp = async() => {
-        const after = await createUserWithEmailAndPassword(auth, email, password);
-        console.log('Success');
-        alert('Check your email')
-    };
+    const [user, setUser] = useState(null);
+    const [initializing, setInitializing] = useState(true);
 
-    const signIn =async () => {
-        const user = await signInWithEmailAndPassword(auth, email, password)
-    };
+    function onAuthStateChanged() {
+        setUser(user);
+        if (initializing) setInitializing(false);
+    }
+
+    useEffect(() => {
+        const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+        return subscriber;
+    }, [])
 
     return (
         <View style={styles.container}>
-            <Text style={styles.logo}>Grocery App</Text>
-            <View style={styles.form}>
-                <TextInput
-                    placeholder='Email'
-                    onChangeText={(text: string) => setEmail(text)}
-                    value={email}
-                    style={styles.input}
-                />
-                <TextInput
-                    placeholder='Password'
-                    textContentType='password'
-                    onChangeText={(text: string) => setPassword(text)}
-                    value={password}
-                    style={styles.input}
-                />
-                <Pressable style={styles.button} onPress={signUp}>
-                    <Text style={styles.buttonText}>Sign Up</Text>
-                </Pressable>
-                <Pressable style={styles.signIn} onPress={signIn}>
-                    <Text style={{fontSize: 14}}>Log In</Text>
-                </Pressable>
-            </View>
-           
+            {!user 
+                ? <Text>Login</Text>
+                : <Text>Welcome {user.email}</Text>
+            }
         </View>
     )
 }
